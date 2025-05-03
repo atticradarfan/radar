@@ -11,6 +11,7 @@
     "@turf/turf": "^6.5.0",
     "aewx-metar-parser": "^1.0.0",
     "brfs": "^2.0.2",
+    "browserify": "^17.0.1",
     "bufferpack": "^0.0.6",
     "cheap-ruler": "^3.0.2",
     "chroma-js": "^2.4.2",
