@@ -57,12 +57,12 @@ function format_value(value) {
             } else if (
                 product_code == 154 /* N0G */ || product_code == 99 /* N0U */ || product_code == 182 /* TVX */ || product_code == 'VEL' // velocity
             ) {
-            // round to the nearest 0.5 m/s
-             value = Math.floor(value * 2) / 2;
-
-            // convert to mph
-            value = value * 2.23694;
-            value = Math.round(value * 10) / 10;
+                // round to the nearest 0.5 m/s
+                value = Math.floor(value * 2) / 2;
+    
+                // convert to mph
+                value = value * 2.23694;
+                value = Math.round(value * 10) / 10;
             }
 
             } else if (
