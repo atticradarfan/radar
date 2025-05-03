@@ -63,8 +63,6 @@ function format_value(value) {
                 // convert to mph
                 value = value * 2.23694;
                 value = Math.round(value * 10) / 10;
-            }
-
             } else if (
             product_code == 159 /* N0X */ || product_code == 'ZDR' || // differential reflectivity
             product_code == 134 /* DVL */ // vertically integrated liquid
