@@ -3,26 +3,26 @@ const product_colors = require('../colormaps/colormaps');
 
 const product_units = {
     'REF': 'dBZ', // level 2 reflectivity
-    'VEL': 'm/s', // level 2 velocity
+    'VEL': 'mph', // level 2 velocity
     'SW': 'mph', // level 2 spectrum width
     'ZDR': 'dB', // level 2 differential reflectivity
     'RHO': '%', // level 2 correlation coefficient
     'PHI': 'deg', // level 2 differential phase shift
 
     153: 'dBZ', // super-res reflectivity
-    154: 'm/s', // super-res velocity
+    154: 'mph', // super-res velocity
     161: '%', // correlation coefficient
     159: 'dB', // differential reflectivity
     // 'NSW': 'mph', // spectrum width
     94: 'dBZ', // digital reflectivity
-    99: 'm/s', // digital base velocity
+    99: 'mph', // digital base velocity
     134: 'kg/m²', // vertically integrated liquid
     // 'N0S': 'knots', // storm relative velocity
     163: 'deg/km', // specific differential phase
 
     180: 'dBZ', // tdwr short-range reflectivity
     186: 'dBZ', // tdwr long-range reflectivity
-    182: 'm/s', // tdwr base velocity
+    182: 'mph', // tdwr base velocity
 }
 
 function decode_and_format(color, cmin, cmax) {
@@ -57,11 +57,14 @@ function format_value(value) {
             } else if (
                 product_code == 154 /* N0G */ || product_code == 99 /* N0U */ || product_code == 182 /* TVX */ || product_code == 'VEL' // velocity
             ) {
-                // round to the nearest 0.5
-                value = Math.floor(value * 2) / 2;
-                // // round to the nearest 0.1
-                // // level 2 & 3 velocity values are provided by default in m/s
-                // value = parseFloat(value.toFixed(1));
+            // round to the nearest 0.5 m/s
+             value = Math.floor(value * 2) / 2;
+
+            // convert to mph
+            value = value * 2.23694;
+            value = Math.round(value * 10) / 10;
+            }
+
             } else if (
             product_code == 159 /* N0X */ || product_code == 'ZDR' || // differential reflectivity
             product_code == 134 /* DVL */ // vertically integrated liquid
