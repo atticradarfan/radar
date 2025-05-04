@@ -1,6 +1,6 @@
 // Initialize these variables for play button
-window.selectedRadarSite = null;
-window.selectedRadarProduct = null;
+window.selectedRadarSite = 'KLWX';
+window.selectedRadarProduct = 'N0B';
 
 
 const electron = require('electron')
