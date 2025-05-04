@@ -444,6 +444,15 @@ https://tobiasahlin.com/spinkit/
     width: 100%;
     background-color: rgb(20, 103, 204);
 }
+
+/* Example active button style */
+#playbackMenuItemDiv.active {
+    background-color: #1e90ff; /* Blue or any color you want */
+    color: white;  /* Adjust text color if needed */
+}
+
+/* Add more styles if needed to match other buttons in the bottom bar */
+
 #mapColorScale {
     position: absolute;
     z-index: 115;
