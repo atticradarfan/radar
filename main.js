@@ -49,18 +49,29 @@ async function startRadarPlayback() {
         return;
     }
 
+    // Change the playback button style to 'active'
+    const playbackButton = document.getElementById('playbackMenuItemDiv');
+    playbackButton.classList.add('active'); // Add 'active' class to the button
+
     const timestamps = generateRecentTimestamps(frameCount);
 
     for (let i = 0; i < timestamps.length; i++) {
         const ts = timestamps[i];
         const tileUrl = `https://radar.weather.gov/ridge/standard/${site}/${product}_${ts}.png`;
+        console.log("Radar Tile URL: ", tileUrl); // Log URL to debug
+
         updateRadarTileLayer(tileUrl);
 
         await new Promise(resolve => setTimeout(resolve, delayMs));
     }
+
+    // Once playback is done, revert button to 'inactive' style
+    playbackButton.classList.remove('active'); // Remove 'active' class when done
 }
 
+// Button click listener to start playback
 document.getElementById('playbackMenuItemDiv').addEventListener('click', startRadarPlayback);
+
 
 function generateRecentTimestamps(count) {
     const now = new Date();
