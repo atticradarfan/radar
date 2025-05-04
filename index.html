@@ -1129,18 +1129,31 @@
             }
         
             function updateRadarTileLayer(tileUrl) {
-                if (window.radarTileLayer) {
-                    // Update the existing tile layer's URL
-                    window.radarTileLayer.setUrl(tileUrl);
+                const map = window.map; // assuming your MapLibre map is stored here
+                const layerId = 'radar-tile-layer';
+            
+                if (map.getSource(layerId)) {
+                    // If source exists, just update the tiles
+                    map.getSource(layerId).setTiles([tileUrl]);
                 } else {
-                    // Add a new tile layer with an ID
-                    window.radarTileLayer = L.tileLayer(tileUrl, {
-                        opacity: 0.6,
-                        zIndex: 99,
-                        id: 'radar-tile-layer' // Add a unique ID for the layer
-                    }).addTo(map);
+                    // Add new raster tile source and layer
+                    map.addSource(layerId, {
+                        type: 'raster',
+                        tiles: [tileUrl],
+                        tileSize: 256
+                    });
+            
+                    map.addLayer({
+                        id: layerId,
+                        type: 'raster',
+                        source: layerId,
+                        paint: {
+                            'raster-opacity': 0.6
+                        }
+                    });
                 }
             }
+
         
             const button = document.getElementById('playbackMenuItemDiv');
             if (button) {
