@@ -99,28 +99,30 @@ function loadTiltBtns(numOfTiltsArr) {
 
 $('.psmRow').click(function(e) {
     if ($(e.target).is($(this)) && !$(this).hasClass('l2prodSel')) {
-        const currentStation = window.atticData.currentStation; // 'KAKQ';
+        const currentStation = window.atticData.currentStation;
 
-        var innerText = $(this).text(); // the long product name, e.g. "Base Reflectivity"
-        var value = $(this).attr('value'); // the abbreviated product name, e.g. "ref", "vel", "hyc"
+        var innerText = $(this).text();
+        var value = $(this).attr('value');
 
         $('#productsDropdownTriggerText').text(longProductNames[value]);
 
         var selectedTiltNum = $(this).find('.psmRowTiltSelect').text().split(' ')[1];
         var resultProduct = productLookup[selectedTiltNum][value];
 
+        // Set global variables here for the playback feature
+        window.selectedRadarSite = currentStation;
+        window.selectedRadarProduct = resultProduct;
+
         window.atticData.from_file_upload = false;
+
         if (value == 'srvel') {
             loaders_nexrad.quick_storm_relative_velocity_plot(currentStation, resultProduct, (L3Factory) => { });
         } else {
             loaders_nexrad.quick_level_3_plot(currentStation, resultProduct, (L3Factory) => { });
         }
-        // loaders.getLatestFile(currentStation, [3, resultProduct, 0], function(url) {
-        //     console.log(url)
-        //     loaders.loadFileObject(ut.phpProxy + url + '#', 3);
-        // })
     }
-})
+});
+
 
 $('.psmRow').on('mouseover mousemove', function(e) {
     // we don't want to highlight the row if we're hovering over the tilt menu
