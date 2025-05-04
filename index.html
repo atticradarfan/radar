@@ -1130,11 +1130,14 @@
         
             function updateRadarTileLayer(tileUrl) {
                 if (window.radarTileLayer) {
+                    // Update the existing tile layer's URL
                     window.radarTileLayer.setUrl(tileUrl);
                 } else {
+                    // Add a new tile layer with an ID
                     window.radarTileLayer = L.tileLayer(tileUrl, {
                         opacity: 0.6,
-                        zIndex: 99
+                        zIndex: 99,
+                        id: 'radar-tile-layer' // Add a unique ID for the layer
                     }).addTo(map);
                 }
             }
