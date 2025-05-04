@@ -27,3 +27,29 @@ function createWindow() {
     }))
 }
 app.on('ready', createWindow)
+
+// Play Button
+async function startRadarPlayback() {
+    const frameCount = 10; // Number of frames to play
+    const delayMs = 400;   // Delay between frames in milliseconds
+
+    const site = window.selectedRadarSite;     // Replace with your method of retrieving the current radar site
+    const product = window.selectedRadarProduct; // Replace with your method of retrieving the current radar product
+
+    if (!site || !product) {
+        console.error("Missing site or product");
+        return;
+    }
+
+    const timestamps = generateRecentTimestamps(frameCount);
+
+    for (let i = 0; i < timestamps.length; i++) {
+        const ts = timestamps[i];
+        const tileUrl = `https://radar.weather.gov/ridge/standard/${site}/${product}_${ts}.png`;
+        updateRadarTileLayer(tileUrl);
+
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+}
+
+document.getElementById('playbackMenuItemDiv').addEventListener('click', startRadarPlayback);
