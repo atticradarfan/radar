@@ -208,6 +208,7 @@ function _init_click_listener() {
             abbvProductToLoad = 'ref';
             // $(`.productOption[value="${abbvProductToLoad}"]`).html()
             $('#productsDropdownTriggerText').html(window.longProductNames[abbvProductToLoad]);
+            window.selectedRadarProduct = productToLoad;
         } else if (stationType == 'TDWR') {
             $('#wsr88d_psm').hide();
             $('#tdwr_psm').show();
