@@ -1061,11 +1061,11 @@
 
     <!-- Play button script -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize these variables for play button
-            window.selectedRadarSite = null;
-            window.selectedRadarProduct = null;
+        // Initialize these variables for play button
+        window.selectedRadarSite = 'KLWX';
+        window.selectedRadarProduct = 'N0B';
         
+        document.addEventListener('DOMContentLoaded', () => {
             async function startRadarPlayback() {
                 const frameCount = 10; // Number of frames to play
                 const delayMs = 400;   // Delay between frames in milliseconds
