@@ -1058,5 +1058,87 @@
             document.getElementById('loadingLibrariesDiv').style.display = 'none';
         })
     </script>
+
+    <!-- Play button script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize these variables for play button
+            window.selectedRadarSite = null;
+            window.selectedRadarProduct = null;
+        
+            async function startRadarPlayback() {
+                const frameCount = 10; // Number of frames to play
+                const delayMs = 400;   // Delay between frames in milliseconds
+        
+                const site = window.selectedRadarSite;
+                const product = window.selectedRadarProduct;
+        
+                console.log("Selected Site: ", site);
+                console.log("Selected Product: ", product);
+        
+                if (!site || !product) {
+                    console.error("Missing site or product");
+                    return;
+                }
+        
+                const playbackButton = document.getElementById('playbackMenuItemDiv');
+                if (!playbackButton) {
+                    console.error("Playback button not found");
+                    return;
+                }
+        
+                playbackButton.classList.add('active'); // visually highlight it
+        
+                const timestamps = generateRecentTimestamps(frameCount);
+        
+                for (let i = 0; i < timestamps.length; i++) {
+                    const ts = timestamps[i];
+                    const tileUrl = `https://radar.weather.gov/ridge/standard/${site}/${product}_${ts}.png`;
+                    console.log("Radar Tile URL: ", tileUrl);
+        
+                    updateRadarTileLayer(tileUrl);
+                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                }
+        
+                playbackButton.classList.remove('active'); // return to normal
+            }
+        
+            function generateRecentTimestamps(count) {
+                const now = new Date();
+                const timestamps = [];
+        
+                for (let i = 0; i < count; i++) {
+                    const d = new Date(now.getTime() - i * 5 * 60 * 1000);
+                    const ts = formatRadarTimestamp(d);
+                    timestamps.push(ts);
+                }
+        
+                return timestamps.reverse();
+            }
+        
+            function formatRadarTimestamp(date) {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}_${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}`;
+            }
+        
+            function updateRadarTileLayer(tileUrl) {
+                if (window.radarTileLayer) {
+                    window.radarTileLayer.setUrl(tileUrl);
+                } else {
+                    window.radarTileLayer = L.tileLayer(tileUrl, {
+                        opacity: 0.6,
+                        zIndex: 99
+                    }).addTo(map);
+                }
+            }
+        
+            const button = document.getElementById('playbackMenuItemDiv');
+            if (button) {
+                button.addEventListener('click', startRadarPlayback);
+            } else {
+                console.error("playbackMenuItemDiv button not found at DOMContentLoaded");
+            }
+        });
+    </script>
 </body>
 </html>
