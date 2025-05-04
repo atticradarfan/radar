@@ -187,6 +187,10 @@ function _init_click_listener() {
     map.on('click', 'stationSymbolLayer', (e) => {
         const base = e.features[0].properties;
         const clickedStation = base.station_id;
+
+        // Set the selected radar site globally here:
+        window.selectedRadarSite = clickedStation;
+        
         window.atticData.currentStation = clickedStation;
         $('#radarStation').html(clickedStation);
         $('#radarLocation').html(nexrad_locations[clickedStation].name);
