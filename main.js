@@ -41,6 +41,9 @@ async function startRadarPlayback() {
     const site = window.selectedRadarSite;     // Replace with your method of retrieving the current radar site
     const product = window.selectedRadarProduct; // Replace with your method of retrieving the current radar product
 
+    console.log("Selected Site: ", site);
+    console.log("Selected Product: ", product);
+    
     if (!site || !product) {
         console.error("Missing site or product");
         return;
