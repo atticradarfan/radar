@@ -1079,77 +1079,64 @@
 
     <!-- Play button script -->
     <script>
-        window.selectedRadarSite = 'KLWX'; // Set your radar site
-        window.selectedRadarProduct = 'N0B'; // Set your radar product
-
+        window.selectedRadarSite = 'KLWX';
+        window.selectedRadarProduct = 'N0Q'; // Reflectivity by default
+    
         document.addEventListener('DOMContentLoaded', () => {
+            const frameCount = 10;
+            const delayMs = 400;
+    
             async function startRadarPlayback() {
-                const frameCount = 10; // Number of frames to play
-                const delayMs = 400;   // Delay between frames in milliseconds
-
                 const site = window.selectedRadarSite;
                 const product = window.selectedRadarProduct;
-
-                console.log("Selected Site: ", site);
-                console.log("Selected Product: ", product);
-
-                if (!site || !product) {
-                    console.error("Missing site or product");
+    
+                const button = document.getElementById('playbackMenuItemDiv');
+                if (!site || !product || !button) {
+                    console.error("Missing required elements or variables.");
                     return;
                 }
-
-                const playbackButton = document.getElementById('playbackMenuItemDiv');
-                if (!playbackButton) {
-                    console.error("Playback button not found");
-                    return;
-                }
-
-                playbackButton.classList.add('active'); // visually highlight it
-
+    
+                button.classList.add('active');
                 const timestamps = generateRecentTimestamps(frameCount);
-
-                for (let i = 0; i < timestamps.length; i++) {
-                    const ts = timestamps[i];
-                    const tileUrl = `https://proxyradar.onrender.com/proxy/radar/${site}/${product}_${ts}.png`;
-                    console.log("Radar Tile URL: ", tileUrl);
-
-                    updateRadarTileLayer(tileUrl);
+    
+                for (const ts of timestamps) {
+                    const frameUrl = `/api/radar-frame/${site}/${product}/${ts}`;
+                    console.log("Loading frame:", frameUrl);
+                    updateRadarTileLayer(frameUrl);
                     await new Promise(resolve => setTimeout(resolve, delayMs));
                 }
-
-                playbackButton.classList.remove('active'); // return to normal
+    
+                button.classList.remove('active');
             }
-
+    
             function generateRecentTimestamps(count) {
                 const now = new Date();
                 const timestamps = [];
-
+    
                 for (let i = 0; i < count; i++) {
-                    const d = new Date(now.getTime() - i * 5 * 60 * 1000); // 5 minute intervals
-                    const ts = formatRadarTimestamp(d);
-                    timestamps.push(ts);
+                    const d = new Date(now.getTime() - i * 5 * 60 * 1000);
+                    timestamps.push(formatRadarTimestamp(d));
                 }
-
+    
                 return timestamps.reverse();
             }
-
+    
             function formatRadarTimestamp(date) {
-                const pad = (n) => n.toString().padStart(2, '0');
+                const pad = n => n.toString().padStart(2, '0');
                 return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}_${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}`;
             }
-
-            function updateRadarTileLayer(tileUrl) {
+    
+            function updateRadarTileLayer(frameUrl) {
                 const img = document.getElementById('radarOverlay');
-                img.src = tileUrl;
+                if (img) img.src = frameUrl;
             }
-
+    
             const button = document.getElementById('playbackMenuItemDiv');
             if (button) {
                 button.addEventListener('click', startRadarPlayback);
-            } else {
-                console.error("playbackMenuItemDiv button not found at DOMContentLoaded");
             }
         });
     </script>
+
 </body>
 </html>
