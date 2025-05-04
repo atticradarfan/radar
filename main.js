@@ -1,8 +1,3 @@
-// Initialize these variables for play button
-window.selectedRadarSite = 'KLWX';
-window.selectedRadarProduct = 'N0B';
-
-
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
