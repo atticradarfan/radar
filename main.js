@@ -53,3 +53,33 @@ async function startRadarPlayback() {
 }
 
 document.getElementById('playbackMenuItemDiv').addEventListener('click', startRadarPlayback);
+
+function generateRecentTimestamps(count) {
+    const now = new Date();
+    const timestamps = [];
+
+    for (let i = 0; i < count; i++) {
+        const d = new Date(now.getTime() - i * 5 * 60 * 1000); // 5-minute intervals
+        const ts = formatRadarTimestamp(d);
+        timestamps.push(ts);
+    }
+
+    return timestamps.reverse(); // Oldest to newest
+}
+
+function formatRadarTimestamp(date) {
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}_${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}`;
+}
+
+function updateRadarTileLayer(tileUrl) {
+    if (window.radarTileLayer) {
+        window.radarTileLayer.setUrl(tileUrl);
+    } else {
+        window.radarTileLayer = L.tileLayer(tileUrl, {
+            opacity: 0.6,
+            zIndex: 99
+        }).addTo(map);
+    }
+}
+
