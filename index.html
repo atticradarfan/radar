@@ -1111,12 +1111,13 @@
         
                 for (let i = 0; i < timestamps.length; i++) {
                     const ts = timestamps[i];
-                    const tileUrl = `https://proxyradar.onrender.com`;
+                    const tileUrl = `https://proxyradar.onrender.com/proxy/radar/${site}/${product}_${ts}.png`;
                     console.log("Radar Tile URL: ", tileUrl);
-        
+                
                     updateRadarTileLayer(tileUrl);
                     await new Promise(resolve => setTimeout(resolve, delayMs));
                 }
+
         
                 playbackButton.classList.remove('active'); // return to normal
             }
