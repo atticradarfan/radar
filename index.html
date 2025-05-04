@@ -833,7 +833,18 @@
     <!-- <canvas id="mapColorScale"></canvas> -->
 
     <div id="map" class="screenshot"></div>
-
+        <!-- Radar overlay image -->
+        <img id="radarOverlay" src="" style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            opacity: 0.6;
+            z-index: 1000;
+        " />
     </div>
 
     <!-- Google tag (gtag.js) -->
@@ -1129,29 +1140,8 @@
             }
         
             function updateRadarTileLayer(tileUrl) {
-                const map = window.map; // assuming your MapLibre map is stored here
-                const layerId = 'radar-tile-layer';
-            
-                if (map.getSource(layerId)) {
-                    // If source exists, just update the tiles
-                    map.getSource(layerId).setTiles([tileUrl]);
-                } else {
-                    // Add new raster tile source and layer
-                    map.addSource(layerId, {
-                        type: 'raster',
-                        tiles: [tileUrl],
-                        tileSize: 256
-                    });
-            
-                    map.addLayer({
-                        id: layerId,
-                        type: 'raster',
-                        source: layerId,
-                        paint: {
-                            'raster-opacity': 0.6
-                        }
-                    });
-                }
+                const img = document.getElementById('radarOverlay');
+                img.src = tileUrl;
             }
 
         
