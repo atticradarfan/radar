@@ -1079,73 +1079,70 @@
 
     <!-- Play button script -->
     <script>
-        // Initialize these variables for play button
-        window.selectedRadarSite = 'KLWX';
-        window.selectedRadarProduct = 'N0B';
-        
+        window.selectedRadarSite = 'KLWX'; // Set your radar site
+        window.selectedRadarProduct = 'N0B'; // Set your radar product
+
         document.addEventListener('DOMContentLoaded', () => {
             async function startRadarPlayback() {
                 const frameCount = 10; // Number of frames to play
                 const delayMs = 400;   // Delay between frames in milliseconds
-        
+
                 const site = window.selectedRadarSite;
                 const product = window.selectedRadarProduct;
-        
+
                 console.log("Selected Site: ", site);
                 console.log("Selected Product: ", product);
-        
+
                 if (!site || !product) {
                     console.error("Missing site or product");
                     return;
                 }
-        
+
                 const playbackButton = document.getElementById('playbackMenuItemDiv');
                 if (!playbackButton) {
                     console.error("Playback button not found");
                     return;
                 }
-        
+
                 playbackButton.classList.add('active'); // visually highlight it
-        
+
                 const timestamps = generateRecentTimestamps(frameCount);
-        
+
                 for (let i = 0; i < timestamps.length; i++) {
                     const ts = timestamps[i];
                     const tileUrl = `https://proxyradar.onrender.com/proxy/radar/${site}/${product}_${ts}.png`;
                     console.log("Radar Tile URL: ", tileUrl);
-                
+
                     updateRadarTileLayer(tileUrl);
                     await new Promise(resolve => setTimeout(resolve, delayMs));
                 }
 
-        
                 playbackButton.classList.remove('active'); // return to normal
             }
-        
+
             function generateRecentTimestamps(count) {
                 const now = new Date();
                 const timestamps = [];
-        
+
                 for (let i = 0; i < count; i++) {
-                    const d = new Date(now.getTime() - i * 5 * 60 * 1000);
+                    const d = new Date(now.getTime() - i * 5 * 60 * 1000); // 5 minute intervals
                     const ts = formatRadarTimestamp(d);
                     timestamps.push(ts);
                 }
-        
+
                 return timestamps.reverse();
             }
-        
+
             function formatRadarTimestamp(date) {
                 const pad = (n) => n.toString().padStart(2, '0');
                 return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}_${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}`;
             }
-        
+
             function updateRadarTileLayer(tileUrl) {
                 const img = document.getElementById('radarOverlay');
                 img.src = tileUrl;
             }
 
-        
             const button = document.getElementById('playbackMenuItemDiv');
             if (button) {
                 button.addEventListener('click', startRadarPlayback);
