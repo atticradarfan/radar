@@ -167,7 +167,7 @@
         </div>
         <!-- Added play button -->
         <span class="noselect">&nbsp;&nbsp;&nbsp;</span>
-        <div id="playbackMenuItemDiv" class="mapFooterMenuItem">
+        <div id="playbackMenuItemDiv" class="mapFooterMenuItem" title="Toggle radar playback">
             <span id="playbackMenuItemIcon" class="fa fa-play icon-grey menu_item_not_selected"></span>
         </div>
         
@@ -1082,23 +1082,26 @@
     <script>
         const siteSelect = document.getElementById('siteSelect');
         const productSelect = document.getElementById('productSelect');
-        const playButton = document.getElementById('playButton');
-        const pauseButton = document.getElementById('pauseButton');
+    
+        // Footer playback icon
+        const playbackButton = document.getElementById('playbackMenuItemDiv');
+        const playbackIcon = document.getElementById('playbackMenuItemIcon');
     
         const updater = new RadarUpdater('radarCanvas');
         let playbackInterval = null;
         let frameIndex = 0;
         let frames = [];
+        let isPlaying = false;
     
         async function loadFrames() {
             const site = siteSelect.value;
             const product = productSelect.value;
             try {
-              frames = await updater.fetchRecentRadarFrames(site, product);
-              frameIndex = 0;
-              if (frames.length > 0) {
-                updater.drawRadarFrame(frames[0]);
-              }
+                frames = await updater.fetchRecentRadarFrames(site, product);
+                frameIndex = 0;
+                if (frames.length > 0) {
+                    updater.drawRadarFrame(frames[0]);
+                }
             } catch (err) {
                 console.error('Failed to load radar frames:', err);
             }
@@ -1106,23 +1109,38 @@
     
         function playFrames() {
             if (!frames.length) return;
-            stopFrames(); // ensure no duplicate interval
-            playbackInterval = setInterval(() => {
-              frameIndex = (frameIndex + 1) % frames.length;
-              updater.drawRadarFrame(frames[frameIndex]);
-            }, 500);
-          }
+            stopFrames(); // Prevent duplicates
+            isPlaying = true;
+            playbackIcon.classList.remove('fa-play');
+            playbackIcon.classList.add('fa-pause');
     
-          function stopFrames() {
-              clearInterval(playbackInterval);
-          }
+            playbackInterval = setInterval(() => {
+                frameIndex = (frameIndex + 1) % frames.length;
+                updater.drawRadarFrame(frames[frameIndex]);
+            }, 500);
+        }
+    
+        function stopFrames() {
+            isPlaying = false;
+            clearInterval(playbackInterval);
+            playbackIcon.classList.remove('fa-pause');
+            playbackIcon.classList.add('fa-play');
+        }
+    
+        // Toggle playback when the map footer icon is clicked
+        playbackButton.addEventListener('click', () => {
+            if (isPlaying) {
+                stopFrames();
+            } else {
+                playFrames();
+            }
+        });
     
         siteSelect.addEventListener('change', loadFrames);
         productSelect.addEventListener('change', loadFrames);
-        playButton.addEventListener('click', playFrames);
-        pauseButton.addEventListener('click', stopFrames);
     
-        loadFrames(); // load first frames on page load
+        // Load first frame on page load
+        loadFrames();
     </script>
 
 </body>
