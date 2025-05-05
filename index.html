@@ -1082,16 +1082,13 @@
     <script>
         const siteSelect = document.getElementById('siteSelect');
         const productSelect = document.getElementById('productSelect');
+        const radarOverlay = document.getElementById('radarOverlay');
+        const playIcon = document.getElementById('playbackMenuItemIcon');
     
-        // Footer playback icon
-        const playbackButton = document.getElementById('playbackMenuItemDiv');
-        const playbackIcon = document.getElementById('playbackMenuItemIcon');
-    
-        const updater = new RadarUpdater('radarCanvas');
-        let playbackInterval = null;
-        let frameIndex = 0;
+        const updater = new RadarUpdater(); // No canvas needed anymore
         let frames = [];
-        let isPlaying = false;
+        let frameIndex = 0;
+        let playbackInterval = null;
     
         async function loadFrames() {
             const site = siteSelect.value;
@@ -1100,47 +1097,34 @@
                 frames = await updater.fetchRecentRadarFrames(site, product);
                 frameIndex = 0;
                 if (frames.length > 0) {
-                    updater.drawRadarFrame(frames[0]);
+                    radarOverlay.src = frames[0];
                 }
             } catch (err) {
                 console.error('Failed to load radar frames:', err);
             }
         }
     
-        function playFrames() {
-            if (!frames.length) return;
-            stopFrames(); // Prevent duplicates
-            isPlaying = true;
-            playbackIcon.classList.remove('fa-play');
-            playbackIcon.classList.add('fa-pause');
-    
-            playbackInterval = setInterval(() => {
-                frameIndex = (frameIndex + 1) % frames.length;
-                updater.drawRadarFrame(frames[frameIndex]);
-            }, 500);
-        }
-    
-        function stopFrames() {
-            isPlaying = false;
-            clearInterval(playbackInterval);
-            playbackIcon.classList.remove('fa-pause');
-            playbackIcon.classList.add('fa-play');
-        }
-    
-        // Toggle playback when the map footer icon is clicked
-        playbackButton.addEventListener('click', () => {
-            if (isPlaying) {
-                stopFrames();
-            } else {
-                playFrames();
+        function togglePlayback() {
+            if (playbackInterval) {
+                clearInterval(playbackInterval);
+                playbackInterval = null;
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+            } else if (frames.length > 0) {
+                playbackInterval = setInterval(() => {
+                    frameIndex = (frameIndex + 1) % frames.length;
+                    radarOverlay.src = frames[frameIndex];
+                }, 500);
+                playIcon.classList.remove('fa-play');
+                playIcon.classList.add('fa-pause');
             }
-        });
+        }
     
         siteSelect.addEventListener('change', loadFrames);
         productSelect.addEventListener('change', loadFrames);
+        document.getElementById('playbackMenuItemDiv').addEventListener('click', togglePlayback);
     
-        // Load first frame on page load
-        loadFrames();
+        loadFrames(); // Load initial frames on page load
     </script>
 
 </body>
