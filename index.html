@@ -1078,53 +1078,52 @@
     </script>
 
     <!-- Play button script -->
+    <script src="RadarUpdater.js"></script>
     <script>
-        async function generateTimestamps(count = 5, intervalMinutes = 6) {
-        const timestamps = [];
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - (now.getMinutes() % intervalMinutes), 0, 0);
+        const siteSelect = document.getElementById('siteSelect');
+        const productSelect = document.getElementById('productSelect');
+        const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
     
-        for (let i = 0; i < count; i++) {
-            const t = new Date(now.getTime() - i * intervalMinutes * 60000);
-            const YYYY = t.getUTCFullYear();
-            const MM = String(t.getUTCMonth() + 1).padStart(2, '0');
-            const DD = String(t.getUTCDate()).padStart(2, '0');
-            const HH = String(t.getUTCHours()).padStart(2, '0');
-            const mm = String(t.getUTCMinutes()).padStart(2, '0');
-            timestamps.unshift(`${YYYY}${MM}${DD}_${HH}${mm}`); // oldest to newest
-        }
-        return timestamps;
-      }
+        const updater = new RadarUpdater('radarCanvas');
+        let playbackInterval = null;
+        let frameIndex = 0;
+        let frames = [];
     
-      async function animateRadarFrames() {
-        const site = 'KLWX';
-        const product = document.getElementById('product').value;
-        const img = document.getElementById('radarImage');
-    
-        const timestamps = await generateTimestamps();
-    
-        let index = 0;
-    
-        function showNext() {
-          if (index >= timestamps.length) return;
-    
-          const timestamp = timestamps[index];
-          img.src = `/proxy/radar/${site}/${product}/${timestamp}`;
-          img.onerror = () => {
-            img.alt = 'Frame missing';
-            img.src = '';
-          };
-    
-          index++;
-          setTimeout(showNext, 600); // 600ms delay between frames
+        async function loadFrames() {
+            const site = siteSelect.value;
+            const product = productSelect.value;
+            try {
+              frames = await updater.fetchRecentRadarFrames(site, product);
+              frameIndex = 0;
+              if (frames.length > 0) {
+                updater.drawRadarFrame(frames[0]);
+              }
+            } catch (err) {
+                console.error('Failed to load radar frames:', err);
+            }
         }
     
-        showNext();
-      }
+        function playFrames() {
+            if (!frames.length) return;
+            stopFrames(); // ensure no duplicate interval
+            playbackInterval = setInterval(() => {
+              frameIndex = (frameIndex + 1) % frames.length;
+              updater.drawRadarFrame(frames[frameIndex]);
+            }, 500);
+          }
     
-      window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('playbackMenuItemDiv')?.addEventListener('click', animateRadarFrames);
-      });
+          function stopFrames() {
+              clearInterval(playbackInterval);
+          }
+    
+        siteSelect.addEventListener('change', loadFrames);
+        productSelect.addEventListener('change', loadFrames);
+        playButton.addEventListener('click', playFrames);
+        pauseButton.addEventListener('click', stopFrames);
+    
+        loadFrames(); // load first frames on page load
     </script>
+
 </body>
 </html>
