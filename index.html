@@ -1079,63 +1079,46 @@
 
     <!-- Play button script -->
     <script>
-        window.selectedRadarSite = 'KLWX';
-        window.selectedRadarProduct = 'N0Q'; // Reflectivity by default
-    
-        document.addEventListener('DOMContentLoaded', () => {
-            const frameCount = 10;
-            const delayMs = 400;
-    
-            async function startRadarPlayback() {
-                const site = window.selectedRadarSite;
-                const product = window.selectedRadarProduct;
-    
-                const button = document.getElementById('playbackMenuItemDiv');
-                if (!site || !product || !button) {
-                    console.error("Missing required elements or variables.");
-                    return;
-                }
-    
-                button.classList.add('active');
-                const timestamps = generateRecentTimestamps(frameCount);
-    
-                for (const ts of timestamps) {
-                    const frameUrl = `/api/radar-frame/${site}/${product}/${ts}`;
-                    console.log("Loading frame:", frameUrl);
-                    updateRadarTileLayer(frameUrl);
-                    await new Promise(resolve => setTimeout(resolve, delayMs));
-                }
-    
-                button.classList.remove('active');
-            }
-    
-            function generateRecentTimestamps(count) {
-                const now = new Date();
-                const timestamps = [];
-    
-                for (let i = 0; i < count; i++) {
-                    const d = new Date(now.getTime() - i * 5 * 60 * 1000);
-                    timestamps.push(formatRadarTimestamp(d));
-                }
-    
-                return timestamps.reverse();
-            }
-    
-            function formatRadarTimestamp(date) {
-                const pad = n => n.toString().padStart(2, '0');
-                return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}_${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}`;
-            }
-    
-            function updateRadarTileLayer(frameUrl) {
-                const img = document.getElementById('radarOverlay');
-                if (img) img.src = frameUrl;
-            }
-    
-            const button = document.getElementById('playbackMenuItemDiv');
-            if (button) {
-                button.addEventListener('click', startRadarPlayback);
+        // Initialize these variables for radar playback
+        let selectedSite = 'KLWX';  // Example radar site
+        let selectedProduct = 'N0Q';  // Example radar product
+        let frameCount = 10;  // Number of frames to play
+        let delayMs = 400;    // Delay between frames in milliseconds
+
+        document.getElementById('playbackButton').addEventListener('click', async function() {
+            // Generate a list of timestamps for playback (you can modify this part)
+            const timestamps = generateRecentTimestamps(frameCount);
+            
+            // Iterate over the timestamps to display radar images
+            for (let i = 0; i < timestamps.length; i++) {
+                const timestamp = timestamps[i];
+                const radarImageUrl = `http://localhost:3000/proxy/radar/${selectedSite}/${selectedProduct}/${timestamp}.png`;
+
+                // Update the radar image on the page
+                document.getElementById('radarOverlay').src = radarImageUrl;
+
+                // Wait for the delay before displaying the next frame
+                await new Promise(resolve => setTimeout(resolve, delayMs));
             }
         });
+
+        // Function to generate recent timestamps for radar playback
+        function generateRecentTimestamps(count) {
+            const now = new Date();
+            const timestamps = [];
+            for (let i = 0; i < count; i++) {
+                const timestamp = new Date(now.getTime() - i * 5 * 60 * 1000);  // 5-minute interval
+                const formattedTimestamp = formatRadarTimestamp(timestamp);
+                timestamps.push(formattedTimestamp);
+            }
+            return timestamps.reverse();
+        }
+
+        // Function to format timestamps as required by the radar image URL
+        function formatRadarTimestamp(date) {
+            const pad = (n) => n.toString().padStart(2, '0');
+            return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}_${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}`;
+        }
     </script>
 
 </body>
