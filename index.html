@@ -1078,53 +1078,31 @@
     </script>
 
     <!-- Play button script -->
-    <script src="app/radar/updater/RadarUpdater.js"></script>
     <script>
-        const siteSelect = document.getElementById('siteSelect');
-        const productSelect = document.getElementById('productSelect');
-        const radarOverlay = document.getElementById('radarOverlay');
-        const playIcon = document.getElementById('playbackMenuItemIcon');
+        const site = window.selectedRadarSite || 'KLWX';
+        const product = window.selectedRadarProduct || 'N0B';
     
-        const updater = new RadarUpdater(); // No canvas needed anymore
-        let frames = [];
-        let frameIndex = 0;
-        let playbackInterval = null;
+        const radarUpdater = new BrowserRadarUpdater(site, product);
     
-        async function loadFrames() {
-            const site = siteSelect.value;
-            const product = productSelect.value;
-            try {
-                frames = await updater.fetchRecentRadarFrames(site, product);
-                frameIndex = 0;
-                if (frames.length > 0) {
-                    radarOverlay.src = frames[0];
-                }
-            } catch (err) {
-                console.error('Failed to load radar frames:', err);
+        async function startRadarPlayback() {
+            const frames = await radarUpdater.fetchRecentRadarFrames();
+            let frameIndex = 0;
+    
+            function showNextFrame() {
+                if (!frames || !frames.length) return;
+    
+                const frame = frames[frameIndex];
+                const img = document.getElementById('radarOverlay');
+                img.src = frame;
+                frameIndex = (frameIndex + 1) % frames.length;
+    
+                setTimeout(showNextFrame, 500);
             }
+    
+            showNextFrame();
         }
     
-        function togglePlayback() {
-            if (playbackInterval) {
-                clearInterval(playbackInterval);
-                playbackInterval = null;
-                playIcon.classList.remove('fa-pause');
-                playIcon.classList.add('fa-play');
-            } else if (frames.length > 0) {
-                playbackInterval = setInterval(() => {
-                    frameIndex = (frameIndex + 1) % frames.length;
-                    radarOverlay.src = frames[frameIndex];
-                }, 500);
-                playIcon.classList.remove('fa-play');
-                playIcon.classList.add('fa-pause');
-            }
-        }
-    
-        siteSelect.addEventListener('change', loadFrames);
-        productSelect.addEventListener('change', loadFrames);
-        document.getElementById('playbackMenuItemDiv').addEventListener('click', togglePlayback);
-    
-        loadFrames(); // Load initial frames on page load
+        document.getElementById('playbackMenuItemDiv').addEventListener('click', startRadarPlayback);
     </script>
 
 </body>
