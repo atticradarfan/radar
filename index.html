@@ -1079,30 +1079,33 @@
 
     <!-- Play button script -->
     <script>
-        const site = window.selectedRadarSite || 'KLWX';
-        const product = window.selectedRadarProduct || 'N0B';
+        document.addEventListener('DOMContentLoaded', () => {
+            const playButton = document.getElementById('playbackMenuItemDiv');
     
-        const radarUpdater = new BrowserRadarUpdater(site, product);
+            playButton.addEventListener('click', () => {
+                const site = window.selectedRadarSite;
+                const product = window.selectedRadarProduct;
     
-        async function startRadarPlayback() {
-            const frames = await radarUpdater.fetchRecentRadarFrames();
-            let frameIndex = 0;
+                if (!site || !product) {
+                    console.error("Missing site or product");
+                    return;
+                }
     
-            function showNextFrame() {
-                if (!frames || !frames.length) return;
+                console.log("Starting radar playback for:", site, product);
     
-                const frame = frames[frameIndex];
-                const img = document.getElementById('radarOverlay');
-                img.src = frame;
-                frameIndex = (frameIndex + 1) % frames.length;
+                // Create a fake nexrad_factory object to match RadarUpdater's expectations
+                const fakeFactory = {
+                    nexrad_level: 3,
+                    station: site,
+                    product_abbv: product,
+                    storm_relative_velocity: product.includes('N0G'),
+                    display_file_info: () => {}
+                };
     
-                setTimeout(showNextFrame, 500);
-            }
-    
-            showNextFrame();
-        }
-    
-        document.getElementById('playbackMenuItemDiv').addEventListener('click', startRadarPlayback);
+                const updater = new RadarUpdater(fakeFactory);
+                updater.enable(); // This handles radar updates (like playback)
+            });
+        });
     </script>
 
 </body>
