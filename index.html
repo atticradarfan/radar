@@ -1079,16 +1079,13 @@
 
     <!-- Play button script -->
     
-    <!--> For testing -->
-    window.selectedRadarSite = "KLWX"; 
-    window.selectedRadarProduct = "N0S";
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const playButton = document.getElementById('playbackMenuItemDiv');
     
             playButton.addEventListener('click', () => {
-                const site = window.selectedRadarSite;
-                const product = window.selectedRadarProduct;
+                const site = "KLWX"     //window.selectedRadarSite;
+                const product = "N0S"   //window.selectedRadarProduct;
     
                 if (!site || !product) {
                     console.error("Missing site or product");
